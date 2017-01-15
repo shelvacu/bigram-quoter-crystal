@@ -32,8 +32,7 @@ end
 
 puts "words length is #{words.size}"
 
-bigrams = Hash(String, Hash(String, UInt32)).new#(Hash(String,Int32).new(0))
-#bigrams = {} of String => Hash(String, Int32)
+bigrams = Hash(String, Hash(String, UInt32)).new
 
 words[0...-1].zip(words[1..-1]) do |prev_word, next_word|
   prev_word = "!start!" if PunctuationStrings.includes? prev_word
@@ -60,25 +59,18 @@ end
 
 File.open("bigrams.save", "w") do |f|
   expected_offset = 0
-  #ppos f
   bigrams.each do |word, next_words|
-    #puts "writing #{word}"
     f.flush
     raise "Unexpected offset" unless f.pos == expected_offset && expected_offset == word_offsets[word]
     f.write_byte word.bytesize.to_u8
-    #ppos f
     f.print word
-    #f.print "\x00" * (30 - word.size)
     (30 - word.size).times do
       f.write_byte 0u8
     end
-    #ppos f
     sum_of_weights = next_words.map(&.last).sum
     sum_of_weights.to_u32.to_io( io: f, format: IO::ByteFormat::LittleEndian)
     next_words.size.to_u32.to_io(io: f, format: IO::ByteFormat::LittleEndian)
     expected_offset += 39
-    #f.flush
-    #puts "expected is #{expected_offset}, actual is #{f.pos}"
     next_words.to_a.sort_by(&.last).reverse.each do |word, weight|
       f.write_byte word.bytesize.to_u8
       f.print word
@@ -90,18 +82,4 @@ File.open("bigrams.save", "w") do |f|
       expected_offset += 39
     end
   end
-  #word_offsets.each do |word, offset|
-  #  offset.to_u32.to_io(io: f, format: IO::ByteFormat::LittleEndian)
-  #end
-  #word_offsets.size.to_u32.to_io(io: f, format: IO::ByteFormat::LittleEndian)
 end
-      
-#max_word_length = 0
-
-#words.each do |word|
-#  if word.bytesize > max_word_length
-#    max_word_length = word.bytesize
-#  end
-#end
-
-#puts max_word_length
