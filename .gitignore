@@ -1,3 +1,5 @@
 #binaries:
 generate-sav-file
 make-quote
+*.bigram
+bigrams.save
