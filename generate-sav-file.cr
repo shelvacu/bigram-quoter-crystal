@@ -14,8 +14,7 @@
 #
 # Also 39 bytes, nice
 
-require "./punctuation"
-require "json"
+require "./common"
 
 words = ["!start!"]
 File.each_line(ARGV[0]) do |line|
@@ -28,11 +27,8 @@ File.each_line(ARGV[0]) do |line|
     else
       words << word
     end
-    #raise "This can't be right! #{word.inspect} #{words[-2..-1].inspect}" if words.last.ends_with?(".") && words.last.size > 1
   end
 end
-
-#puts "words length is #{words.size}"
 
 bigrams = Hash(String, Hash(String, UInt32)).new
 
@@ -42,8 +38,6 @@ words[0...-1].zip(words[1..-1]) do |prev_word, next_word|
   bigrams[prev_word][next_word] = 0u32 unless bigrams[prev_word].has_key? next_word
   bigrams[prev_word][next_word] += 1
 end
-
-#puts "bigrams length is #{bigrams.size}"
 
 word_offsets = {} of String => UInt32
 
@@ -58,10 +52,6 @@ def ppos(f : File)
   f.flush
   puts f.pos
 end
-
-#puts bigrams.to_json
-
-#exit
 
 File.open("bigrams.save", "w") do |f|
   expected_offset = 0

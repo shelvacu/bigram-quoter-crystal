@@ -1,4 +1,4 @@
-require "./punctuation"
+require "./common"
 
 def read_word(fh : File)
   len = fh.read_byte
@@ -14,7 +14,6 @@ def read_word(fh : File)
 end
 
 def select_next(fh, weight_sum, num_words = nil)
-  #exit if weight_sum == 0
   selection = rand(weight_sum)
   so_far = 0
   loop do
